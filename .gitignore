@@ -20,3 +20,6 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+
+#build output...  should find a way to put that in the right place...
+gofarkle

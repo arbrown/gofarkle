@@ -54,7 +54,7 @@ func main() {
 			}
 
 			// Lack of ternary... not cool
-			fmt.Printf("Starting game with %d player%s:\n", numPlayers, s)
+			fmt.Printf(" Starting game with %d player%s:\n", numPlayers, s)
 			for i,p := range players {
 				fmt.Printf("  %d.)\t%s\n", i,p)
 			}
