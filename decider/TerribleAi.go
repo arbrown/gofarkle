@@ -1,13 +1,13 @@
 // A terrible AI at Farkle
-package farkle
+package decider
 import (
 	"math"
 )
 type TerribleAi struct {
-	targetScore int
+	TargetScore int
 }
 
-// Keep 1's and 5's until potentialScore is over targetScore (probably 250)
+// Keep 1's and 5's until potentialScore is over TargetScore (probably 250)
 func (t TerribleAi) FarkleDecide(dice []int, runScore int, totalScore int, numFarkles int, opponenetScores []int) (keep []bool, rollAgain bool) {
 
 	diceRolled := len(dice)
@@ -45,5 +45,5 @@ func (t TerribleAi) FarkleDecide(dice []int, runScore int, totalScore int, numFa
 
 	potentialScore = runScore + onesScore + fivesScore
 
-	return keepers, potentialScore < t.targetScore
+	return keepers, potentialScore < t.TargetScore
 }
