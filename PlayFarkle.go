@@ -188,6 +188,8 @@ func getAi(name string) (ai farkle.FarkleDecider, err error) {
 		return farkle.TerribleAi { TargetScore:250 }, nil
 	case "TerribleAi2":
 		return farkle.TerribleAi { TargetScore:200}, nil
+	case "GreedyAi":
+		return farkle.TerribleAi { TargetScore:600}, nil
 
 	}
 	
@@ -228,12 +230,18 @@ func takeTurn(game *farkle.GameState, player int)  {
 		rollScore, kept := score(dice, keepers)
 		numDice = numDice - kept
 		if rollScore == 0{
+			runScore = 0
 			game.PlayerFarkles[player] += 1
+			rollAgain = false
+			if debug {
+				fmt.Printf("%s farkle count: %d\n", game.PlayerNames[player], game.PlayerFarkles[player])
+			}
+		}else {
+			game.PlayerFarkles[player] = 0
 		}
 		if game.PlayerFarkles[player] >= 3{
-			rollScore = -1000
+			runScore = -1000
 			game.PlayerFarkles[player] = 0
-			rollAgain = false
 		}
 		if numDice == 0{
 			numDice = 6
