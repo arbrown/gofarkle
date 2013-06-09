@@ -20,6 +20,7 @@ func main() {
 	var help = flag.Bool("help", false, "prints this help message")
 	var randomOrder = flag.Bool("rand", false, "whether player order should be shuffled each game")
 	var score = flag.Int("score", 10000, "target score threshold")
+	var seed = flag.String("seed", "", "play with a specific game seed")
 
 	flag.Parse()
 
@@ -41,10 +42,12 @@ func main() {
 
 	game.Players = make([]farkle.FarkleDecider, 0)
 	game.PlayerNames = make([]string, 0)
+	originalPlayerId := make([]int, 0)
+	wins := make([]int, 0)
 	
 	var playerNames = flag.Args()
 
-	for _,s := range playerNames {
+	for i,s := range playerNames {
 		
 		ai, err := getAi(s)
 
@@ -54,13 +57,24 @@ func main() {
 		}
 		game.Players = append(game.Players, ai)
 		game.PlayerNames = append(game.PlayerNames,s)
+		originalPlayerId = append(originalPlayerId, i)
+		wins = append(wins, 0)
 	}
 
 	numPlayers := len(game.Players) 
 
+	// if a seed was specified, randomize the dice just once
+	if *seed != "" {
+		rand.Seed(util.Hash(*seed))
+	}
 
 	for i:=0;i<*numGames;i++ {
-		dice.Randomize()
+		// Not sure if I REALLY need to reseed
+		// random each game...
+		if (*seed==""){
+			dice.Randomize()
+		}
+
 		turn := 1
 
 		if verbose {
@@ -70,7 +84,7 @@ func main() {
 			}
 
 			// Lack of ternary... not cool
-			fmt.Printf(" Starting game with %d player%s:\n", numPlayers, s)
+			fmt.Printf(" Starting game #%d with %d player%s:\n", i, numPlayers, s)
 			for i,p := range game.PlayerNames {
 				fmt.Printf("  %d.)\t%s\n", i,p)
 			}
@@ -90,6 +104,7 @@ func main() {
 				n--
 				game.Players[n], game.Players[k] = game.Players[k], game.Players[n]
 				game.PlayerNames[n], game.PlayerNames[k] = game.PlayerNames[k], game.PlayerNames[n]
+				originalPlayerId[n], originalPlayerId[k] = originalPlayerId[k], originalPlayerId[n]
 			}
 		}
 		
@@ -100,7 +115,7 @@ func main() {
 		game.PlayerFarkles = make([]int, n)
 
 		// While nobody has hit the target score
-		for player = 0 ;checkScores(game.PlayerScores, score_threshold); player = (player+1) % n {
+		for player = 0 ;; player = (player+1) % n {
 			if verbose && player == 0 {
 				fmt.Printf(" Starting turn #%d\n", turn)
 			}
@@ -108,11 +123,15 @@ func main() {
 			if debug && player == numPlayers -1 {
 				fmt.Println("Current scores:")
 				for j,k := range game.PlayerNames {
-					fmt.Printf("%s\t%d", k, game.PlayerScores[j])
+					fmt.Printf("%s\t%d\n", k, game.PlayerScores[j])
 				}
 			}
 			if player == numPlayers - 1{
 				turn++
+			}
+
+			if game.PlayerScores[player] > score_threshold {
+				break
 			}
 		}
 
@@ -120,21 +139,45 @@ func main() {
 			fmt.Printf(" %s has reached the target score with %d\n", game.PlayerNames[player], game.PlayerScores[player])
 		}
 
-		var firstOut = i
+		var firstOut = player
+		if debug {
+			fmt.Printf("firstOut: %s(%d)\n", game.PlayerNames[firstOut], firstOut)
+		}
 		// give everyone else one last chance
-		for player = (player + 1) % n; i != firstOut; player = (player + 1) % n {
+		for player = (player + 1) % n; player != firstOut; player = (player + 1) % n {
+			if debug {
+				fmt.Printf("%s taking last turn", game.PlayerNames[player])
+			}
 			takeTurn(game, player)
 		}
 		
 		winner := util.Maxidx(game.PlayerScores)
 
+		if debug {
+			fmt.Printf("Player %d is the winner with %d\n", winner, game.PlayerScores[winner])
+		}
+
+		wins[originalPlayerId[winner]]++
+
 		if verbose {
 			fmt.Printf(" %s is the winner\n", game.PlayerNames[winner])
 			for i,v := range game.PlayerNames {
-				fmt.Printf(" %s\t%d", v, game.PlayerScores[i])
+				fmt.Printf(" %s\t%d\n", v, game.PlayerScores[i])
 			}
 		}
 	}
+
+	var s string
+	if *numGames != 1 {
+		s = "s"
+	}
+	fmt.Printf("Played %d game%s\n", *numGames, s)
+	fmt.Printf("==================\n")
+	fmt.Printf("%-15s%s\n", "Player", "Wins")
+	for i, w := range wins{
+		fmt.Printf("%-15s%d\n", playerNames[i], w)
+	}
+	
 
 }
 
@@ -143,6 +186,8 @@ func getAi(name string) (ai farkle.FarkleDecider, err error) {
 	switch name {
 	case "TerribleAi":
 		return farkle.TerribleAi { TargetScore:250 }, nil
+	case "TerribleAi2":
+		return farkle.TerribleAi { TargetScore:200}, nil
 
 	}
 	
@@ -153,6 +198,9 @@ func getAi(name string) (ai farkle.FarkleDecider, err error) {
 func checkScores(scores []int, threshold int) bool {
 	for _, score:= range scores {
 		if score >= threshold {
+			if debug {
+				fmt.Printf("Score %d over threshold %d", score, threshold)
+			}
 			return false
 		}
 	}

@@ -24,7 +24,8 @@ func Maxidx(slc []int) int {
 	max, maxidx := slc[0], 0
 	for i,v := range slc {
 		if v > max {
-			max = i
+			max = v
+			maxidx = i
 		}
 	}
 	return maxidx
