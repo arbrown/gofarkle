@@ -9,7 +9,7 @@ type TerribleAi struct {
 
 // Keep 1's and 5's until potentialScore is over TargetScore (probably 250)
 func (t TerribleAi) FarkleDecide(dice []int, runScore int, game GameState, player int) (keep []bool, rollAgain bool) {
-	
+
 	diceRolled := len(dice)
 
 	var keepers = make([]bool, diceRolled)
