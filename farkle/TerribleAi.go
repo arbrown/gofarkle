@@ -1,5 +1,5 @@
 // A terrible AI at Farkle
-package decider
+package farkle
 import (
 	"math"
 )
@@ -8,8 +8,8 @@ type TerribleAi struct {
 }
 
 // Keep 1's and 5's until potentialScore is over TargetScore (probably 250)
-func (t TerribleAi) FarkleDecide(dice []int, runScore int, totalScore int, numFarkles int, opponenetScores []int) (keep []bool, rollAgain bool) {
-
+func (t TerribleAi) FarkleDecide(dice []int, runScore int, game GameState, player int) (keep []bool, rollAgain bool) {
+	
 	diceRolled := len(dice)
 
 	var keepers = make([]bool, diceRolled)

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"flag"
 	"os"
-	"github.com/arbrown/gofarkle/decider"
-	"github.com/arbrown/gofarkle/game"
+	"github.com/arbrown/gofarkle/farkle"
 	"math/rand"
 )
 
@@ -36,9 +35,9 @@ func main() {
 		os.Exit(2)
 	}
 
-	game := new(game.GameState)
+	game := new(farkle.GameState)
 
-	game.Players = make([]decider.FarkleDecider, 0)
+	game.Players = make([]farkle.FarkleDecider, 0)
 	game.PlayerNames = make([]string, 0)
 	
 	var playerNames = flag.Args()
@@ -98,6 +97,12 @@ func main() {
 		// While nobody has hit the target score
 		for player = 0 ;checkScores(game.PlayerScores, score_threshold); player = (player+1) % n {
 			takeTurn(game, player)
+			if debug && player == numPlayers {
+				fmt.Println("Current scores:")
+				for j,k := range game.PlayerNames {
+					fmt.Printf("%s\t%d", k, game.PlayerScores[j])
+				}
+			}
 		}
 
 		var firstOut = i
@@ -109,11 +114,11 @@ func main() {
 
 }
 
-func getAi(name string) (ai decider.FarkleDecider, err error) {
+func getAi(name string) (ai farkle.FarkleDecider, err error) {
 
 	switch name {
 	case "TerribleAi":
-		return decider.TerribleAi { TargetScore:250 }, nil
+		return farkle.TerribleAi { TargetScore:250 }, nil
 
 	}
 	
@@ -130,18 +135,91 @@ func checkScores(scores []int, threshold int) bool {
 	return true
 }
 
-func takeTurn(game *game.GameState, player int)  {
+func takeTurn(game *farkle.GameState, player int)  {
+	name := game.PlayerNames[player]
+	ai := game.Players[player]
+	if verbose {
+		fmt.Printf(" %s starting turn\n", name)
+	}
+
 	// Change score / farkles as necessary
+	rollAgain := true
+	numDice := 6
+	var runScore int
+	for rollAgain {
+		var keepers []bool
+		dice := rollDice(numDice)
+		keepers, rollAgain = ai.FarkleDecide(dice, runScore, *game, player)
+		rollScore := score(dice, keepers)
+		switch {
+		case rollScore == 0:
+			game.PlayerFarkles[player] += 1
+		case game.PlayerFarkles[player] >= 3:
+			rollScore = -1000
+			game.PlayerFarkles[player] = 0
+			rollAgain = false
+		}
+
+		runScore += rollScore
+	}
+
+	game.PlayerScores[player] += runScore
+	if verbose {
+		fmt.Printf(" %s scored %d", name, runScore)
+	}
+}
+
+func rollDice(numDice int) (dice []int)	 {
+	dice = make([]int, numDice)
+	for i:=0;i<numDice;i++ {
+		dice[i] = rand.Intn(6) + 1
+	}
+
+	if verbose {
+		fmt.Printf(" Rolled: %v\n", dice)
+	}
+
+	return dice
+}
+
+func score(dice []int, keepers []bool) (score int){
+
+	var kept int
+	for _, b := range keepers {
+		if b{
+			kept++
+		}
+	}
+
+	// Ideally this function should verify that the 'kept'
+	// dice were kept legally.  Since slices are passed by
+	// reference, we can just modify the keepers slice
+	// to reflect which dice were actually kept (i.e. legally)
+	if verbose {
+		fmt.Printf(" Keeping ")
+		var count int
+		for i,b := range keepers {
+			switch {
+			case b == false:
+				break
+			case b == true:
+				count++
+				fmt.Printf("%d", dice[i])
+			case count < kept:
+				fmt.Printf(", ")
+			}
+		}
+	}
+
+	//score = 0
 
 
+	return
 }
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 	flag.PrintDefaults()
 	fmt.Fprintln(os.Stderr, "Following all flags specify which AIs are playing e.g.:")
-	fmt.Fprintf(os.Stderr, "%s -v -games=10 TerribleAi DecentAi", os.Args[0])
+	fmt.Fprintf(os.Stderr, "%s -v -games=10 TerribleAi DecentAi\n", os.Args[0])
 }
-
-
-
