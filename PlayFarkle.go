@@ -190,6 +190,8 @@ func getAi(name string) (ai farkle.FarkleDecider, err error) {
 		return farkle.TerribleAi { TargetScore:200}, nil
 	case "GreedyAi":
 		return farkle.TerribleAi { TargetScore:600}, nil
+	case "Human":
+		return farkle.Human { PrintDice:!verbose }, nil
 
 	}
 	
@@ -348,6 +350,7 @@ func score6(diceKeptCount []int) (score int) {
 
 func score5(diceKeptCount []int) (score int) {
 	score = 0
+	scoremore := true
 	switch {
 		case util.Cmpslc(diceKeptCount,[]int{5,0,0,0,0,0}):
 			score += 4000
@@ -359,14 +362,18 @@ func score5(diceKeptCount []int) (score int) {
 			score += 1600
 		case util.Cmpslc(diceKeptCount, []int{1,1,1,1,1,0}):
 			score += 1500
+			scoremore = false
 		case util.Cmpslc(diceKeptCount, []int{0,1,1,1,1,1}):
 			score += 1500
+			scoremore = false
 		case util.Cmpslc(diceKeptCount,[]int{0,0,5,0,0,0}):
 			score += 1200
 		case util.Cmpslc(diceKeptCount,[]int{0,5,0,0,0,0}):
 			score += 800		
 	}
-	score += score4(diceKeptCount)
+	if (scoremore){
+		score += score4(diceKeptCount)
+	}
 	return score
 }
 
@@ -410,7 +417,7 @@ func score3(diceKeptCount []int) (score int) {
 		score += diceKeptCount[0] * 100
 	}
 	if (diceKeptCount[4] < 3){
-		score += diceKeptCount[0] * 50
+		score += diceKeptCount[4] * 50
 	}
 	return score
 }
