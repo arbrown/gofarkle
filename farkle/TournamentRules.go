@@ -240,6 +240,8 @@ func score6(diceKeptCount []int) (score int) {
 			score = 3200
 		case util.Cmpslc(diceKeptCount,[]int{0,0,6,0,0,0}):
 			score = 2400
+		case util.Cmpslc(diceKeptCount, []int{2,1,1,1,1,0}):
+			score += 1600
 		case util.Cmpslc(diceKeptCount,[]int{0,6,0,0,0,0}):
 			score = 1600
 		default:
