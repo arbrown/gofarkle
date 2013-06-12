@@ -228,21 +228,21 @@ func (tr TournamentRules) score(dice []int, keepers []bool) (score int, diceKept
 
 func score6(diceKeptCount []int) (score int) {
 		switch {
-		case util.Cmpslc(diceKeptCount,[]int{6,0,0,0,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{6,0,0,0,0,0}, false):
 			score = 8000
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,0,6}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,0,0,0,6}, false):
 			score = 4800
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,6,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,0,0,6,0}, false):
 			score = 4000
-		case util.Cmpslc(diceKeptCount, []int{1,1,1,1,1,1}):
+		case util.Cmpslc(diceKeptCount, []int{1,1,1,1,1,1}, false):
 			score = 3000
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,6,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,0,6,0,0}, false):
 			score = 3200
-		case util.Cmpslc(diceKeptCount,[]int{0,0,6,0,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,6,0,0,0}, false):
 			score = 2400
-		case util.Cmpslc(diceKeptCount, []int{2,1,1,1,1,0}):
+		case util.Cmpslc(diceKeptCount, []int{2,1,1,1,1,0}, false):
 			score += 1600
-		case util.Cmpslc(diceKeptCount,[]int{0,6,0,0,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,6,0,0,0,0}, false):
 			score = 1600
 		default:
 			// check for 3-pair
@@ -252,6 +252,7 @@ func score6(diceKeptCount []int) (score int) {
 				score = 0
 			}
 		}
+	score += score5(diceKeptCount)
 	return score
 }
 
@@ -259,23 +260,23 @@ func score5(diceKeptCount []int) (score int) {
 	score = 0
 	scoremore := true
 	switch {
-		case util.Cmpslc(diceKeptCount,[]int{5,0,0,0,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{5,0,0,0,0,0}, true):
 			score += 4000
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,0,5}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,0,0,0,5}, true):
 			score = 2400
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,5,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,0,0,5,0}, true):
 			score += 2000
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,5,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,0,5,0,0}, true):
 			score += 1600
-		case util.Cmpslc(diceKeptCount, []int{1,1,1,1,1,0}):
+		case util.Cmpslc(diceKeptCount, []int{1,1,1,1,1,0}, true):
 			score += 1500
 			scoremore = false
-		case util.Cmpslc(diceKeptCount, []int{0,1,1,1,1,1}):
+		case util.Cmpslc(diceKeptCount, []int{0,1,1,1,1,1}, true):
 			score += 1500
 			scoremore = false
-		case util.Cmpslc(diceKeptCount,[]int{0,0,5,0,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,0,5,0,0,0}, true):
 			score += 1200
-		case util.Cmpslc(diceKeptCount,[]int{0,5,0,0,0,0}):
+		case util.Cmpslc(diceKeptCount, []int{0,5,0,0,0,0}, true):
 			score += 800		
 	}
 	if (scoremore){
@@ -287,17 +288,17 @@ func score5(diceKeptCount []int) (score int) {
 func score4(diceKeptCount []int) (score int) {
 	score = 0
 	switch {
-		case util.Cmpslc(diceKeptCount,[]int{4,0,0,0,0,0}):
+		case util.Cmpslc(diceKeptCount,[]int{4,0,0,0,0,0}, true):
 			score += 2000
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,0,4}):
+		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,0,4}, true):
 			score = 1200
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,4,0}):
+		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,4,0}, true):
 			score += 1000
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,4,0,0}):
+		case util.Cmpslc(diceKeptCount,[]int{0,0,0,4,0,0}, true):
 			score += 800
-		case util.Cmpslc(diceKeptCount,[]int{0,0,4,0,0,0}):
+		case util.Cmpslc(diceKeptCount,[]int{0,0,4,0,0,0}, true):
 			score += 600
-		case util.Cmpslc(diceKeptCount,[]int{0,4,0,0,0,0}):
+		case util.Cmpslc(diceKeptCount,[]int{0,4,0,0,0,0}, true):
 			score += 400		
 	}
 	score += score3(diceKeptCount)
@@ -306,19 +307,24 @@ func score4(diceKeptCount []int) (score int) {
 
 func score3(diceKeptCount []int) (score int) {
 	score = 0
-	switch {
-		case util.Cmpslc(diceKeptCount,[]int{3,0,0,0,0,0}):
-			score += 1000
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,0,3}):
-			score = 600
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,0,3,0}):
-			score += 500
-		case util.Cmpslc(diceKeptCount,[]int{0,0,0,3,0,0}):
-			score += 400
-		case util.Cmpslc(diceKeptCount,[]int{0,0,3,0,0,0}):
-			score += 300
-		case util.Cmpslc(diceKeptCount,[]int{0,3,0,0,0,0}):
-			score += 200		
+
+	if util.Cmpslc(diceKeptCount,[]int{3,0,0,0,0,0}, true){
+		score += 1000
+	}
+	if util.Cmpslc(diceKeptCount,[]int{0,0,0,0,0,3}, true){
+		score = 600
+	}
+	if util.Cmpslc(diceKeptCount,[]int{0,0,0,0,3,0}, true){
+		score += 500
+	}
+	if util.Cmpslc(diceKeptCount,[]int{0,0,0,3,0,0}, true){
+		score += 400
+	}
+	if util.Cmpslc(diceKeptCount,[]int{0,0,3,0,0,0}, true){
+		score += 300
+	}
+	if util.Cmpslc(diceKeptCount,[]int{0,3,0,0,0,0}, true){
+		score += 200		
 	}
 	if (diceKeptCount[0] < 3){
 		score += diceKeptCount[0] * 100

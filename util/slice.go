@@ -2,14 +2,16 @@ package util
 
 // A wonderful C-ish name for a C-ish function
 // pronounces "cumpslice" obviously...
-func Cmpslc(a,b []int) bool {
+func Cmpslc(a,b []int, minOnly bool) bool {
 	lena, lenb := len(a), len(b)
 	if lena != lenb {
 		return false
 	}
 
 	for i, v := range a{
-		if v!= b[i]{
+		if v != b[i] && !minOnly {
+			return false
+		} else if v < b[i] && minOnly {
 			return false
 		}
 	}
