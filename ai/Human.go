@@ -1,9 +1,10 @@
-package farkle
+package ai
 
 import (
 	"regexp"
 	"fmt"
 	"strconv"
+	"github.com/arbrown/gofarkle/farkle"
 )
 
 type Human struct {
@@ -11,7 +12,7 @@ type Human struct {
 }
 
 
-func (h Human) FarkleDecide(dice []int, runScore int, game GameState, player int) (keep []bool, rollAgain bool) {
+func (h Human) FarkleDecide(dice []int, runScore int, game farkle.GameState, player int) (keep []bool, rollAgain bool) {
 	var keepstr, rollstr, pad string
 
 	ndice := len(dice)

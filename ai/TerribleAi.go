@@ -1,14 +1,15 @@
 // A terrible AI at Farkle
-package farkle
+package ai
 import (
 	"math"
+	"github.com/arbrown/gofarkle/farkle"
 )
 type TerribleAi struct {
 	TargetScore int
 }
 
 // Keep 1's and 5's until potentialScore is over TargetScore (probably 250)
-func (t TerribleAi) FarkleDecide(dice []int, runScore int, game GameState, player int) (keep []bool, rollAgain bool) {
+func (t TerribleAi) FarkleDecide(dice []int, runScore int, game farkle.GameState, player int) (keep []bool, rollAgain bool) {
 
 	diceRolled := len(dice)
 
