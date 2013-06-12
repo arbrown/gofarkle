@@ -100,14 +100,17 @@ func getAi(name string) (player farkle.FarkleDecider, err error) {
 
 	switch name {
 	case "TerribleAi":
-		return ai.TerribleAi { TargetScore:250 }, nil
+		return ai.TerribleAi { TargetScore:200 }, nil
 	case "TerribleAi2":
-		return ai.TerribleAi { TargetScore:200}, nil
+		return ai.TerribleAi { TargetScore:250}, nil
+	case "TerribleAi3":
+		return ai.TerribleAi { TargetScore:300}, nil
+	case "TerribleAi4":
+		return ai.TerribleAi { TargetScore:350}, nil
 	case "GreedyAi":
 		return ai.TerribleAi { TargetScore:600}, nil
 	case "Human":
 		return ai.Human { PrintDice:!verbose }, nil
-
 	}
 	
 	return nil, fmt.Errorf("Error, '%s' is not a recognized Farkle AI\n", name)
