@@ -35,21 +35,13 @@ func main() {
 		usage()
 		os.Exit(2)
 	}
-
-	game := new(farkle.GameState)
-
-	//////////////////////
-	game.Players = make([]farkle.FarkleDecider, 0)
 	players := make([]farkle.FarkleDecider, 0)
-	//////////////////
 
-	////////
-	game.PlayerNames = make([]string, 0)
 	names := make([]string, 0)
-	////////
 
 	wins := make([]int, 0)
-	
+		
+	turns := make([]int, 0)	
 	var playerNames = flag.Args()
 
 	for _,s := range playerNames {
@@ -60,14 +52,10 @@ func main() {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
 		}
-		game.Players = append(game.Players, ai)
 		players = append(players, ai)
-
-		//////////
-		game.PlayerNames = append(game.PlayerNames,s)
 		names = append(names, s)
-		/////////
 		wins = append(wins, 0)
+		turns = append(turns, 0)
 	}
 
 
@@ -89,13 +77,9 @@ func main() {
 
 	for i:=0;i<*numGames;i++ {
 
-		winner := gameRules.GamePlay(players)
-
-		if debug {
-			fmt.Printf("Player %d is the winner with %d\n", winner, game.PlayerScores[winner])
-		}
-
+		winner, numTurns := gameRules.GamePlay(players)
 		wins[winner]++
+		turns[winner] += numTurns
 	}
 
 	var s string
@@ -104,9 +88,9 @@ func main() {
 	}
 	fmt.Printf("Played %d game%s\n", *numGames, s)
 	fmt.Printf("==================\n")
-	fmt.Printf("%-15s%s\n", "Player", "Wins")
+	fmt.Printf("%-15s%-10s%-10s\n", "Player", "Wins", "Avg. Turns / Win")
 	for i, w := range wins{
-		fmt.Printf("%-15s%d\n", playerNames[i], w)
+		fmt.Printf("%-15s%-10d%-10.2f\n", playerNames[i], w, (float64)(turns[i])/(float64)(w))
 	}
 	
 

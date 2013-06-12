@@ -1,5 +1,5 @@
 package farkle
 
 type GamePlayer interface {
-	GamePlay(players []FarkleDecider) (winner_id int)
+	GamePlay(players []FarkleDecider) (winner_id, turns int)
 }

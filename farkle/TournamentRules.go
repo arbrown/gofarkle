@@ -15,7 +15,7 @@ type TournamentRules struct {
 
 }
 
-func (tr TournamentRules) GamePlay(players []FarkleDecider) (winner_id int) {
+func (tr TournamentRules) GamePlay(players []FarkleDecider) (winner_id, turns int) {
 	numPlayers := len(players)
 
 	game := new(GameState)
@@ -73,6 +73,8 @@ func (tr TournamentRules) GamePlay(players []FarkleDecider) (winner_id int) {
 	}
 
 	var firstOut = player
+	turns = turn
+
 	if tr.Debug {
 		fmt.Printf("firstOut: %s(%d)\n", game.PlayerNames[firstOut], firstOut)
 	}
@@ -85,6 +87,9 @@ func (tr TournamentRules) GamePlay(players []FarkleDecider) (winner_id int) {
 	}
 
 	winner_id = util.Maxidx(game.PlayerScores)
+	if winner_id != firstOut {
+		turns++
+	}
 
 	if tr.Verbose {
 		fmt.Printf(" %s is the winner\n", game.PlayerNames[winner_id])
